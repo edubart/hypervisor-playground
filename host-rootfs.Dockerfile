@@ -23,6 +23,9 @@ RUN apk add gcc git make
 # Install development headers and libraries
 RUN apk add libc-dev linux-headers libfdt
 
+# Install socat (for testing VSOCKETS)
+RUN apk add socat
+
 # Install kvmtool
 RUN <<EOF
 git clone https://github.com/edubart/kvmtool.git

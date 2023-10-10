@@ -20,6 +20,9 @@ RUN apt-get install -y gdb strace device-tree-compiler
 # Install testing tools
 RUN apt-get install -y stress-ng
 
+# Install socat (for testing VSOCKETS)
+RUN apt-get install -y socat
+
 # Make build more or less reproducible
 RUN rm -rf /var/lib/apt/lists/* /var/log/*
 
