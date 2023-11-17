@@ -27,6 +27,7 @@ RUN apk add libc-dev linux-headers libfdt
 RUN apk add socat
 
 # Install kvmtool
+ADD https://raw.githubusercontent.com/ziglang/zig/5f864140194c91a60cb8e132a7596b555971e808/lib/libc/include/riscv64-linux-gnu/bits/wordsize.h /usr/include/bits/wordsize.h
 RUN <<EOF
 git clone https://github.com/edubart/kvmtool.git
 cd kvmtool
