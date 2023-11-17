@@ -1,30 +1,37 @@
 FROM --platform=linux/riscv64 busybox:latest AS busybox-stage
 FROM --platform=linux/riscv64 riscv64/alpine:edge
 
+RUN <<EOF
 # Update system
-RUN apk update && apk upgrade
+apk update && apk upgrade
 
-# Install busybox with cttyhack support
-RUN apk add busybox
-COPY --from=busybox-stage /bin/busybox /bin/busybox
+# Install busybox
+apk add busybox
 
 # Install debug tools
-RUN apk add gdb strace dtc bash tmux
+apk add gdb strace dtc bash tmux
 
 # Install qemu
-RUN apk add qemu qemu-riscv64 qemu-system-riscv64
-
-# Install testing tools
-RUN apk add stress-ng
+apk add qemu qemu-riscv64 qemu-system-riscv64
 
 # Install build essential
-RUN apk add gcc git make
+apk add gcc git make
 
 # Install development headers and libraries
-RUN apk add libc-dev linux-headers libfdt
+apk add libc-dev linux-headers libfdt
 
 # Install socat (for testing VSOCKETS)
-RUN apk add socat
+apk add socat
+
+# Install stress testing tools
+apk add stress-ng
+
+# Make build more or less reproducible
+rm -rf /var/lib/apt/lists/* /var/log/*
+EOF
+
+# Replace busybox with cttyhack syupport
+COPY --from=busybox-stage /bin/busybox /bin/busybox
 
 # Install kvmtool
 ADD https://raw.githubusercontent.com/ziglang/zig/5f864140194c91a60cb8e132a7596b555971e808/lib/libc/include/riscv64-linux-gnu/bits/wordsize.h /usr/include/bits/wordsize.h
@@ -35,12 +42,11 @@ make lkvm-static -j4
 install lkvm-static /usr/bin/lkvm
 EOF
 
-# Make build more or less reproducible
-RUN rm -rf /var/lib/apt/lists/* /var/log/*
-
 # Replace init
-ADD --chmod=755 https://raw.githubusercontent.com/cartesi/machine-emulator-tools/09fb3f476c3155f876e1093836e1b56cac5dbd1d/skel/opt/cartesi/bin/init /opt/cartesi/bin/init
+ADD --chmod=755 https://raw.githubusercontent.com/cartesi/machine-emulator-tools/v0.13.0/skel/opt/cartesi/bin/init /opt/cartesi/bin/init
+
+# Replace machine name
 RUN echo host-machine > /etc/hostname
 
 # Copy guest linux
-COPY linux-nobbl-6.5.6-ctsi-y-v0.17.0.bin /root
+COPY linux-nobbl-6.5.9-ctsi-y-v0.18.0.bin /root

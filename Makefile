@@ -1,5 +1,5 @@
-HOST_LINUX=linux-6.5.6-ctsi-y-v0.17.0.bin
-GUEST_LINUX=linux-nobbl-6.5.6-ctsi-y-v0.17.0.bin
+HOST_LINUX=linux-6.5.9-ctsi-y-v0.18.0.bin
+GUEST_LINUX=linux-nobbl-6.5.9-ctsi-y-v0.18.0.bin
 
 all: host-image guest-image
 host-image: host-rootfs.ext2

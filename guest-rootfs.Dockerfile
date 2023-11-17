@@ -1,31 +1,31 @@
 FROM --platform=linux/riscv64 riscv64/ubuntu:22.04
 
+RUN <<EOF
 # Update system
-RUN apt-get update && apt-get upgrade -y
+apt-get update && apt-get upgrade -y
 
 # Install busybox
-RUN apt-get install -y busybox-static
+apt-get install -y busybox-static
+
+# Install debug tools
+apt-get install -y gdb strace device-tree-compiler
+
+# Install testing tools
+apt-get install -y stress-ng
+
+# Install socat (for testing VSOCKETS)
+apt-get install -y socat
+
+# Make build more or less reproducible
+rm -rf /var/lib/apt/lists/* /var/log/*
+EOF
 
 # Install emulator tools
+ADD https://github.com/cartesi/machine-emulator-tools/releases/download/v0.13.0/machine-emulator-tools-v0.13.0.deb machine-emulator-tools.deb
 RUN <<EOF
-apt-get install -y wget
-wget -O machine-emulator-tools.deb https://github.com/cartesi/machine-emulator-tools/releases/download/v0.12.0/machine-emulator-tools-v0.12.0.deb
 dpkg -i machine-emulator-tools.deb
 rm -f machine-emulator-tools.deb
 EOF
 
-# Install debug tools
-RUN apt-get install -y gdb strace device-tree-compiler
-
-# Install testing tools
-RUN apt-get install -y stress-ng
-
-# Install socat (for testing VSOCKETS)
-RUN apt-get install -y socat
-
-# Make build more or less reproducible
-RUN rm -rf /var/lib/apt/lists/* /var/log/*
-
-# Replace init
-ADD --chmod=755 https://raw.githubusercontent.com/cartesi/machine-emulator-tools/09fb3f476c3155f876e1093836e1b56cac5dbd1d/skel/opt/cartesi/bin/init /opt/cartesi/bin/init
+# Replace machine name
 RUN echo guest-machine > /etc/hostname
